@@ -6,6 +6,7 @@ import torch
 from PIL import Image
 import io
 import base64
+from pathlib import Path
 
 app = FastAPI()
 
@@ -19,7 +20,8 @@ app.add_middleware(
 )
 
 # Load YOLOv5 model
-model = torch.hub.load('backend/yolov5', 'custom', path='backend/best.pt', source='local')
+model_path = Path("backend/best.pt").as_posix()
+model = torch.hub.load('backend/yolov5', 'custom', path=model_path, source='local', force_reload=True)
 
 @app.get("/")
 def read_root():
