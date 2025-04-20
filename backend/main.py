@@ -21,6 +21,10 @@ app.add_middleware(
 # Load YOLOv5 model
 model = torch.hub.load('yolov5', 'custom', path='best.pt', source='local')
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello from FastAPI"}
+
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...)):
     contents = await file.read()
@@ -35,6 +39,6 @@ async def predict(file: UploadFile = File(...)):
     img_str = base64.b64encode(buffered.getvalue()).decode()
 
     return JSONResponse(content={"image": img_str})
-
+    
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=8000, reload=True)
