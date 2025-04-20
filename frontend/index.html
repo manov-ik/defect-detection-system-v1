@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Defect Detection System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="imgc">
+    <h2>Defect Detection System</h2>
+    <p>Upload an image and then submit to predict</p>
+   </div>
+  
+
+  <input type="file" id="fileInput" accept="image/*" />
+  <button  id="submitBtn" onclick="updateText()">Submit</button>
+  <div  class="imgc"><h3 id="myText">Image:</h3></div>
+
+  
+  <img id="displayImage" style="max-width: 500px;" />
+
+  <script>
+    let selectedFile;
+    const fileInput = document.getElementById("fileInput");
+    const submitBtn = document.getElementById("submitBtn");
+    const displayImg = document.getElementById("displayImage");
+  
+    fileInput.addEventListener("change", () => {
+      selectedFile = fileInput.files[0];
+      if (!selectedFile) return;
+  
+      const reader = new FileReader();
+      reader.onload = () => {
+        displayImg.src = reader.result;
+      };
+      reader.readAsDataURL(selectedFile);
+    });
+  
+    submitBtn.addEventListener("click", async () => {
+      if (!selectedFile) {
+        alert("Please select an image before submitting.");
+        return;
+      }
+  
+      // Update the text only when a valid image is selected
+      updateText();
+  
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+  
+      try {
+        const response = await fetch("http://localhost:8000/predict/", {
+          method: "POST",
+          body: formData,
+        });
+  
+        const data = await response.json();
+        displayImg.src = `data:image/jpeg;base64,${data.image}`;
+      } catch (error) {
+        console.error("Error during fetch:", error);
+      }
+    });
+  
+    function updateText() {
+      document.getElementById("myText").textContent = "Predicted Image:";
+    }
+  </script>
+  
+  
+</body>
+</html>

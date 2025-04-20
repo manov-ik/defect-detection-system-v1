@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Defect Detection</title>
+    <style>
+        video, canvas, img {
+            max-width: 100%;
+            width: 320px;
+            margin: 10px auto;
+            display: block;
+        }
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">Weld & Paint Defect Detection</h2>
+
+    <video id="video" autoplay></video>
+    <button onclick="captureAndSend()">Detect</button>
+    <img id="resultImage" src="" alt="Prediction will appear here" />
+
+    <script>
+        const video = document.getElementById('video');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            });
+
+        async function captureAndSend() {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            canvas.toBlob(async function (blob) {
+                const formData = new FormData();
+                formData.append('file', blob, 'frame.jpg');
+
+                const res = await fetch('/detect', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const blobResult = await res.blob();
+                const url = URL.createObjectURL(blobResult);
+                document.getElementById('resultImage').src = url;
+            }, 'image/jpeg');
+        }
+    </script>
+</body>
+</html>
