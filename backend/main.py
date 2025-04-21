@@ -20,8 +20,7 @@ app.add_middleware(
 )
 
 # Load YOLOv5 model
-model_path = Path("backend/best.pt").as_posix()
-model = torch.hub.load('backend/yolov5', 'custom', path=model_path, source='local', force_reload=True)
+model = torch.hub.load('yolov5', 'custom', path='best.pt', source='local')
 
 @app.get("/")
 def read_root():
